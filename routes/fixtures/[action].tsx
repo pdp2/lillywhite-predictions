@@ -1,7 +1,7 @@
 import { PageProps, Handlers } from "$fresh/server.ts";
 import Header from "../../components/Header.tsx";
 import LayoutContainer from "../../components/LayoutContainer.tsx";
-import AddFixtureRoundForm from "../../components/AddFixtureRoundForm.tsx";
+import AddFixtureRoundForm from "../../islands/AddFixtureRoundForm.tsx";
 
 interface Data {
   firstFixtureDate: string;
@@ -23,12 +23,22 @@ function getHeadingText(action: string) {
   return result;
 }
 
+let firstFixtureDate = '';
+let lastFixtureDate = '';
+
 export const handler: Handlers<Data> = {
-  GET(req, ctx) {
-    const url = new URL(req.url);
-    const firstFixtureDate = url.searchParams.get('firstFixtureDate') || '';
-    const lastFixtureDate = url.searchParams.get('lastFixtureDate') || '';
-    return ctx.render({ firstFixtureDate, lastFixtureDate });
+  async GET(req, ctx) {
+    console.log('GET', req);
+    return await ctx.render({ firstFixtureDate, lastFixtureDate });
+  },
+  async POST(req, ctx) {
+    console.log('POST =======', req);
+    console.log('POST =======', ctx);
+    const form = await req.formData();
+    firstFixtureDate = form.get('firstFixtureDate')?.toString() || '';
+    lastFixtureDate = form.get('lastFixtureDate')?.toString() || '';
+    
+    return await ctx.render({firstFixtureDate, lastFixtureDate});
   },
 };
 
